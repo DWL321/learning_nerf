@@ -17,7 +17,7 @@ This repository is initially created by [Haotong Lin](https://haotongl.github.io
 
 ## Data preparation
 
-Download NeRF synthetic dataset and add a link to the data directory. After preparation, you should have the following directory structure: 
+Download [NeRF synthetic dataset](https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1) and add a link to the data directory. After preparation, you should have the following directory structure: 
 ```
 data/nerf_synthetic
 |-- chair
