@@ -38,7 +38,7 @@ train:
     batch_size: 1
     lr: 5e-4
     weight_decay: 0.
-    epoch: 20 # 100 * 500
+    epoch: 200 # 100 * 500
     scheduler:
         type: 'exponential'
         gamma: 0.1

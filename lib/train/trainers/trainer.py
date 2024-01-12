@@ -114,7 +114,7 @@ class Trainer(object):
         loss_state = []
         for k in val_loss_stats.keys():
             val_loss_stats[k] /= data_size
-            loss_state.append('{}: {:.4f}'.format(k, val_loss_stats[k]))
+            loss_state.append('{}: {:.8f}'.format(k, val_loss_stats[k]))
         print(loss_state)
 
         if evaluator is not None:

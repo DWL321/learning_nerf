@@ -23,8 +23,10 @@ class Evaluator:
     def evaluate(self, output, batch):
         # assert image number = 1
         H, W = batch['meta']['H'].item(), batch['meta']['W'].item()
-        pred_rgb = output['rgb'][0].reshape(H, W, 3).detach().cpu().numpy()
-        gt_rgb = batch['rgb'][0].reshape(H, W, 3).detach().cpu().numpy()
+        pred_rgb = output['rgb'][0].reshape(H, W, 3).detach().cpu().numpy()*255
+        pred_rgb = pred_rgb.astype(np.uint8)
+        gt_rgb = batch['rgb'][0].reshape(H, W, 3).detach().cpu().numpy()*255
+        gt_rgb = gt_rgb.astype(np.uint8)
         psnr_item = psnr(gt_rgb, pred_rgb, data_range=1.)
         self.psnrs.append(psnr_item)
         save_path = os.path.join(cfg.result_dir, 'vis/res.jpg')
