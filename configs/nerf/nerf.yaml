@@ -16,6 +16,18 @@ task_arg:
     chunk_size: 4096 # chunkify
     white_bkgd: True # use white background
     cascade_samples: [64, 128] # importance sampling, you can set it to [64] for the initial implemetation
+    no_batching: True # 合成的数据集一般都是True, 每次只从一张图片中选取随机光线.真实的数据集一般都是False, 图形先混在一起
+    N_samples: 64 # number of coarse samples per ray
+    N_importance: 0 # number of additional fine samples per ray
+    perturb: 1 # set to 0. for no jitter, 1. for jitter
+    use_viewdirs: True # use full 5D input instead of 3D
+    i_embed: 0 # set 0 for default positional encoding, -1 for none
+    multires: 10 # (x,y,z)低频映射到高频时L=10，log2 of max freq for positional encoding (3D location)
+    multires_views: 4 # 观察方向d=(θ,ϕ)低频映射到高频时L=4，log2 of max freq for positional encoding (2D direction)
+    raw_noise_std: 0 # std dev of noise added to regularize sigma_a output, 1e0 recommended
+    precrop_iters: 500 # number of steps to train on central crops
+    precrop_frac: 0.5 # fraction of img taken for central crops
+    test_skip: 1 # will load 1/N images from test/val sets, useful for large datasets
 
 network:
     nerf:
