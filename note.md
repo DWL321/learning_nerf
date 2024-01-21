@@ -76,7 +76,7 @@ TypeError: Cannot handle this data type: (1, 1, 3), <f4
 ## 复现NeRF
 ### 配置文件
 修改configs/nerf/nerf.yaml
-### 创建dataset： lib.datasets.nerf.synthetic.py
+### 创建dataset： lib.datasets.nerf.synthetic.py和lib.datasets.nerf.synthetic_path.py
 
 核心函数包括：init, getitem, len.
 
@@ -100,6 +100,7 @@ python run.py --type dataset --cfg_file configs/nerf/nerf.yaml
 
 init函数负责定义网络所必需的模块，forward函数负责接收dataset的输出，利用定义好的模块，计算输出。例如，对于NeRF来说，我们需要在init中定义两个mlp以及encoding方式，在forward函数中，使用rays完成计算。
 
+创建lib/networks/nerf/network.py、lib/networks/nerf/renderer/make_renderer.py、lib/networks/nerf/renderer/nerf_net_utils.py、100644 lib/networks/nerf/renderer/volume_renderer.py
 
 #### debug：
 
