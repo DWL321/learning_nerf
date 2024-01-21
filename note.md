@@ -116,7 +116,7 @@ python run.py --type network --cfg_file configs/nerf/nerf.yaml
 ```
 ### loss模块和evaluator模块
 
-这两个模块较为简单，不作仔细描述。
+创建lib/evaluators/nerf.py和lib/train/losses/nerf.py
 
 debug方式分别为：
 
