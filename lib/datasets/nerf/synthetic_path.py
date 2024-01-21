@@ -1,21 +1,13 @@
 import torch.utils.data as data
-#导入PyTorch中的`torch.utils.data`模块，并将其命名为`data`，用于处理数据相关的工具函数和类。
 import torch
-#导入PyTorch库，用于进行张量计算和深度学习模型的构建与训练。
 import numpy as np
-#导入NumPy库，并将其命名为`np`，用于进行数值计算和数组操作。
 import os
-#导入Python的`os`模块，用于与操作系统进行交互，例如文件路径操作和环境变量访问。
 from lib.utils import data_utils
-# 从`lib.utils`模块中导入`data_utils`函数，该函数包含一些数据处理的实用工具函数。
 from lib.config import cfg
-#从`lib.config`模块中导入`cfg`对象，该对象包含一些配置参数。
 import imageio
-#导入`imageio`库，用于读取和写入图像文件。
 import json
-#导入Python的`json`模块，用于处理JSON格式的数据。
 import cv2
-#导入OpenCV库，用于图像处理和计算机视觉任务。
+
 
 def trans_t(t):
     return np.array([
@@ -111,7 +103,6 @@ class Dataset(data.Dataset):
             for i, img in enumerate(imgs):
                 imgs_half[i] = cv2.resize(img, (W, H), interpolation=cv2.INTER_AREA)
             imgs = imgs_half
-
         # whether use white background
         if self.white_bkgd:
             imgs = imgs[..., :3] * imgs[..., -1:] + (1 - imgs[..., -1:]) # (..., 4) -> (..., 3)
@@ -123,7 +114,6 @@ class Dataset(data.Dataset):
         self.H = H
         self.W = W
         self.focal = focal
-        
         # Simple Pinhole Camera Model
         self.K = np.array([
             [self.focal, 0, 0.5 * self.W],
@@ -158,6 +148,7 @@ class Dataset(data.Dataset):
         self.rays_d = torch.stack(rays_d)                    # (num_imgs, H, W, 3)
         # self.imgs = self.imgs.reshape(self.num_imgs, -1, 3)  # (num_imgs, H * W, 3)
         self.render_rays_o, self.render_rays_d = self.get_render_rays()  # (40, H, W, 3)
+        self.num_imgs = self.render_rays_d.shape[0]
 
     def __getitem__(self, index):
         """
@@ -172,28 +163,10 @@ class Dataset(data.Dataset):
         """
         index = 0 if self.use_single_view else index
 
-        if self.split == 'train':
-            self.num_iter_train += 1
-
-            ray_os = self.rays_o[index]  # (H, W, 3)
-            ray_ds = self.rays_d[index]  # (H, W, 3)
-            rgbs = self.imgs[index]      # (H, W, 3)
-
-            # coords = self.coords_center if self.num_iter_train < self.precrop_iters else self.coords
-            coords = self.coords
-            coords = torch.reshape(coords, [-1, 2])
-            select_ids = np.random.choice(coords.shape[0], size=self.batch_size, replace=False)
-            select_coords = coords[select_ids].long()
-
-            ray_o = ray_os[select_coords[:, 0], select_coords[:, 1]]  # (N_rays, 3)
-            ray_d = ray_ds[select_coords[:, 0], select_coords[:, 1]]  # (N_rays, 3)
-            batch_rays = torch.stack([ray_o, ray_d], 0)               # (2, N_rays, 3)
-            rgb = rgbs[select_coords[:, 0], select_coords[:, 1]]      # (N_rays, 3)
-
-        else:
-            ray_o = self.rays_o[index].reshape(-1, 3)  # (H * W, 3)
-            ray_d = self.rays_d[index].reshape(-1, 3)  # (H * W, 3)
-            rgb = self.imgs[index].reshape(-1, 3)      # (H * W, 3)
+        ray_o = self.render_rays_o[index].reshape(-1, 3)  # (H * W, 3)
+        ray_d = self.render_rays_d[index].reshape(-1, 3)  # (H * W, 3)
+        rgb = self.imgs[index].reshape(-1, 3)      # (H * W, 3)
+        # render_rays_o, render_rays_d = self.get_render_rays()
 
         ret = {'ray_o': ray_o, 'ray_d': ray_d, 'rgb': rgb, 'near':2., 'far':6.}
         ret.update({'meta':

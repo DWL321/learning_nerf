@@ -2,7 +2,7 @@
 ## 环境配置
 ```
 conda create -n learning_nerf python=3.9
-source activate learning_nerf
+conda activate learning_nerf
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 pip install -r requirements.txt
 ```
@@ -74,6 +74,58 @@ TypeError: Cannot handle this data type: (1, 1, 3), <f4
         gt_rgb = gt_rgb.astype(np.uint8)
 ```
 ## 复现NeRF
+### 配置文件
+修改configs/nerf/nerf.yaml
+### 创建dataset： lib.datasets.nerf.synthetic.py
+
+核心函数包括：init, getitem, len.
+
+init函数负责从磁盘中load指定格式的文件，计算并存储为特定形式。
+
+getitem函数负责在运行时提供给网络一次训练需要的输入，以及groundtruth的输出。
+例如对NeRF，分别是1024条rays以及1024个RGB值。
+
+len函数是训练或者测试的数量。getitem函数获得的index值通常是[0, len-1]。
+
+
+#### debug：
+
+```
+python run.py --type dataset --cfg_file configs/nerf/nerf.yaml
+```
+
+### 创建network:
+
+核心函数包括：init, forward.
+
+init函数负责定义网络所必需的模块，forward函数负责接收dataset的输出，利用定义好的模块，计算输出。例如，对于NeRF来说，我们需要在init中定义两个mlp以及encoding方式，在forward函数中，使用rays完成计算。
+
+
+#### debug：
+
+```
+python run.py --type network --cfg_file configs/nerf/nerf.yaml
+```
+**出现RuntimeError：No CUDA GPUs are available报错**
+```
+//在.cuda()前面
+    os.environ["CUDA_VISIBLE_DEVICES"]="0"
+    torch.cuda.current_device()
+    torch.cuda._initialized = True
+```
+### loss模块和evaluator模块
+
+这两个模块较为简单，不作仔细描述。
+
+debug方式分别为：
+
+```
+python train_net.py --cfg_file configs/nerf/nerf.yaml
+```
+
+```
+python run.py --type evaluate --cfg_file configs/nerf/nerf.yaml
+```
 ### 参考资料
 + [NeRF源码解析](https://www.bilibili.com/video/BV1d841187tn/?share_source=copy_web&vd_source=82f2d2d3d2d3b3112e473c0a443cc278)
 ###

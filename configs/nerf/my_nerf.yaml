@@ -1,0 +1,76 @@
+task: nerf
+gpus: [0]
+exp_name: 'nerf'
+scene: 'lego'
+
+# module path
+train_dataset_module: lib.datasets.nerf.synthetic 
+test_dataset_module: lib.datasets.nerf.synthetic
+network_module: lib.networks.nerf.network
+loss_module: lib.train.losses.nerf
+evaluator_module: lib.evaluators.nerf
+visualizer_module: lib.visualizers.nerf
+
+task_arg:
+    N_rays: 1024 # number of rays per training iteration
+    chunk_size: 4096 # chunkify
+    white_bkgd: True # use white background
+    cascade_samples: [64, 128] # importance sampling, you can set it to [64] for the initial implemetation
+    no_batching: True # 合成的数据集一般都是True, 每次只从一张图片中选取随机光线.真实的数据集一般都是False, 图形先混在一起
+    N_samples: 64 # number of coarse samples per ray
+    N_importance: 0 # number of additional fine samples per ray
+    perturb: 1 # set to 0. for no jitter, 1. for jitter
+    use_viewdirs: True # use full 5D input instead of 3D
+    i_embed: 0 # set 0 for default positional encoding, -1 for none
+    multires: 10 # (x,y,z)低频映射到高频时L=10，log2 of max freq for positional encoding (3D location)
+    multires_views: 4 # 观察方向d=(θ,ϕ)低频映射到高频时L=4，log2 of max freq for positional encoding (2D direction)
+    raw_noise_std: 0 # std dev of noise added to regularize sigma_a output, 1e0 recommended
+    precrop_iters: 500 # number of steps to train on central crops
+    precrop_frac: 0.5 # fraction of img taken for central crops
+    test_skip: 1 # will load 1/N images from test/val sets, useful for large datasets
+
+network:
+    nerf:
+        W: 256 # width
+        D: 8 # depth
+        V_D: 1 # appearance depth
+    xyz_encoder:
+        type: 'frequency' # positional encoding
+        input_dim: 3
+        freq: 10
+    dir_encoder:
+        type: 'frequency'
+        input_dim: 3
+        freq: 4
+
+train_dataset:
+    data_root: 'data/nerf_synthetic'
+    split: 'train'
+    input_ratio: 1. # input image ratio, you can set it to 0.5 to acclerate training
+    cams: [0, -1, 1] # input cameras, you can use this variable to select training images
+
+test_dataset:
+    data_root: 'data/nerf_synthetic'
+    split: 'test'
+    input_ratio: 0.5
+    cams: [0, -1, 100]
+
+train:
+    batch_size: 1
+    lr: 5e-4
+    weight_decay: 0.
+    epoch: 400
+    scheduler:
+        type: 'exponential'
+        gamma: 0.1
+        decay_epochs: 1000
+    num_workers: 4
+
+test:
+    batch_size: 1
+
+ep_iter: 500
+save_ep: 20
+eval_ep: 20       # 10000 iterations
+save_latest_ep: 5 # 2500 iterations
+log_interval: 10
