@@ -68,24 +68,73 @@ def run_network():
     print(total_time / len(data_loader))
 
 
+# def run_evaluate():
+#     from lib.datasets import make_data_loader
+#     from lib.evaluators import make_evaluator
+#     import tqdm
+#     import torch
+#     from lib.networks import make_network
+#     from lib.utils import net_utils
+#     import time
+
+#     os.environ["CUDA_VISIBLE_DEVICES"]="0"
+#     torch.cuda.current_device()
+#     torch.cuda._initialized = True
+
+#     network = make_network(cfg).cuda()
+#     net_utils.load_network(network,
+#                            cfg.trained_model_dir,
+#                            resume=cfg.resume,
+#                            epoch=cfg.test.epoch)
+#     network.eval()
+
+#     data_loader = make_data_loader(cfg, is_train=False)
+#     evaluator = make_evaluator(cfg)
+#     net_time = []
+#     for batch in tqdm.tqdm(data_loader):
+#         for k in batch:
+#             if k != 'meta':
+#                 batch[k] = batch[k].cuda()
+#         with torch.no_grad():
+#             torch.cuda.synchronize()
+#             start_time = time.time()
+#             output = network(batch)
+#             torch.cuda.synchronize()
+#             end_time = time.time()
+#         net_time.append(end_time - start_time)
+#         evaluator.evaluate(output, batch)
+#     evaluator.summarize()
+#     if len(net_time) > 1:
+#         print('net_time: ', np.mean(net_time[1:]))
+#         print('fps: ', 1./np.mean(net_time[1:]))
+#     else:
+#         print('net_time: ', np.mean(net_time))
+#         print('fps: ', 1./np.mean(net_time))
+    
 def run_evaluate():
-    from lib.datasets import make_data_loader
-    from lib.evaluators import make_evaluator
+    import time
     import tqdm
     import torch
+    from lib.datasets import make_data_loader
+    from lib.evaluators import make_evaluator
     from lib.networks import make_network
-    from lib.utils import net_utils
-    import time
+    from lib.networks.nerf.renderer import make_renderer
+    from lib.utils.net_utils import load_network
+
+    os.environ["CUDA_VISIBLE_DEVICES"]="0"
+    torch.cuda.current_device()
+    torch.cuda._initialized = True
 
     network = make_network(cfg).cuda()
-    net_utils.load_network(network,
-                           cfg.trained_model_dir,
-                           resume=cfg.resume,
-                           epoch=cfg.test.epoch)
+    load_network(network,
+                 cfg.trained_model_dir,
+                 resume=cfg.resume,
+                 epoch=cfg.test.epoch)
     network.eval()
 
     data_loader = make_data_loader(cfg, is_train=False)
     evaluator = make_evaluator(cfg)
+    renderer = make_renderer(cfg, network)
     net_time = []
     for batch in tqdm.tqdm(data_loader):
         for k in batch:
@@ -94,7 +143,7 @@ def run_evaluate():
         with torch.no_grad():
             torch.cuda.synchronize()
             start_time = time.time()
-            output = network(batch)
+            output = renderer.render(batch)
             torch.cuda.synchronize()
             end_time = time.time()
         net_time.append(end_time - start_time)
@@ -106,6 +155,7 @@ def run_evaluate():
     else:
         print('net_time: ', np.mean(net_time))
         print('fps: ', 1./np.mean(net_time))
+
 
 # def run_visualize():
 #     from lib.networks import make_network

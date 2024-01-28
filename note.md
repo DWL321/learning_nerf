@@ -28,6 +28,7 @@ python run.py --type evaluate --cfg_file configs/img_fit/lego_view0.yaml
 
 ```
 tensorboard --logdir=data/record --bind_all
+//在浏览器打开localhost:6006
 ```
 ### 遇到的问题
 **训练到epoch 9评估器evaluate时报错**
@@ -116,7 +117,7 @@ python run.py --type network --cfg_file configs/nerf/nerf.yaml
 ```
 ### loss模块和evaluator模块
 
-创建lib/evaluators/nerf.py和lib/train/losses/nerf.py
+创建lib/evaluators/nerf.py和lib/train/losses/nerf.py、lib/train/trainers/nerf.py
 
 debug方式分别为：
 
@@ -129,7 +130,3 @@ python run.py --type evaluate --cfg_file configs/nerf/nerf.yaml
 ```
 ### 参考资料
 + [NeRF源码解析](https://www.bilibili.com/video/BV1d841187tn/?share_source=copy_web&vd_source=82f2d2d3d2d3b3112e473c0a443cc278)
-###
-```
-
-```

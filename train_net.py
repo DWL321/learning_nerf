@@ -8,6 +8,10 @@ import torch.multiprocessing
 import torch
 import torch.distributed as dist
 import os
+
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
+torch.cuda.current_device()
+torch.cuda._initialized = True
 torch.autograd.set_detect_anomaly(True)
 
 if cfg.fix_random:

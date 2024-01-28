@@ -1,7 +1,7 @@
 task: nerf
 gpus: [2] # set gpu device number
 exp_name: "nerf"
-scene: "lego"
+scene: "hotdog"
 
 train_dataset_module: 'lib.datasets.nerf.synthetic'
 train_dataset_path: 'lib/datasets/nerf/synthetic.py'
@@ -77,12 +77,12 @@ train:
   batch_size: 1
   lr: 5e-4 # learning rate
   weight_decay: 0.
-  epoch: 600
+  epoch: 60
   optim: 'adam'
   scheduler:
     type: "exponential"
     gamma: 0.1
-    decay_epochs: 500 # original 1000
+    decay_epochs: 50 # original 1000
   num_workers: 4
 
 test:
@@ -92,7 +92,7 @@ eval:
   whole_img: True
 
 ep_iter: 500 # number of iterations in each epoch
-save_ep: 40
-eval_ep: 40 # 20000 iterations
+save_ep: 4
+eval_ep: 4 # 2000 iterations
 save_latest_ep: 10 # 5000 iterations
 log_interval: 10
