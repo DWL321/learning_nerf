@@ -128,5 +128,7 @@ python train_net.py --cfg_file configs/nerf/nerf.yaml
 ```
 python run.py --type evaluate --cfg_file configs/nerf/nerf.yaml
 ```
+
+图片合成mp4：ffmpeg -framerate 25 -r 20 -i view%03d_pred.png -c:v libx264 -b:v 600k -pix_fmt yuv420p result.mp4
 ### 参考资料
 + [NeRF源码解析](https://www.bilibili.com/video/BV1d841187tn/?share_source=copy_web&vd_source=82f2d2d3d2d3b3112e473c0a443cc278)
