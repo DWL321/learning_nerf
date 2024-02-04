@@ -1,7 +1,7 @@
 task: nerf
-gpus: [2] # set gpu device number
+gpus: [0] # set gpu device number
 exp_name: "nerf"
-scene: "hotdog"
+scene: "lego"
 
 train_dataset_module: 'lib.datasets.nerf.synthetic'
 train_dataset_path: 'lib/datasets/nerf/synthetic.py'
