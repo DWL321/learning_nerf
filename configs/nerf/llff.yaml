@@ -1,7 +1,7 @@
 task: nerf
 gpus: [2] # set gpu device number
 exp_name: "nerf"
-scene: "nerf_data"
+scene: "nerf_data_small"
 
 train_dataset_module: 'lib.datasets.nerf.llff'
 train_dataset_path: 'lib/datasets/nerf/llff.py'
@@ -71,8 +71,6 @@ test_dataset:
   cams: [0, -1, 100]
   H: 800
   W: 800
-  # H: 480
-  # W: 270
 
 train:
   single_view: False
@@ -94,7 +92,7 @@ eval:
   whole_img: True
 
 ep_iter: 500 # number of iterations in each epoch
-save_ep: 4
-eval_ep: 4 # 2000 iterations
+save_ep: 10
+eval_ep: 10 # 5000 iterations
 save_latest_ep: 10 # 5000 iterations
 log_interval: 10

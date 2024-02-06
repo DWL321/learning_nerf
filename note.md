@@ -129,8 +129,38 @@ python train_net.py --cfg_file configs/nerf/nerf.yaml
 python run.py --type evaluate --cfg_file configs/nerf/nerf.yaml
 ```
 
-图片合成mp4：ffmpeg -framerate 25 -r 20 -i view%03d_pred.png -c:v libx264 -b:v 600k -pix_fmt yuv420p result.mp4
+图片合成mp4：ffmpeg -framerate 25 -r 20 -i view%03d_pred.png -c:v libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -b:v 600k -pix_fmt yuv420p result.mp4 -y
 ### 使用自己拍摄的数据测试
 mp4抽帧获得图片序列：ffmpeg -i video.mp4 -r 9 image/%3d.jpg
+
+windows报错：
+mogrify -resize 12.5% -format png *.jpg
+/bin/sh: 1: mogrify: not found
+Traceback (most recent call last):
+  File "/home/dwl/Desktop/reasearch/nerf_recurrent/learning_nerf/train_net.py", line 120, in <module>
+    main()
+  File "/home/dwl/Desktop/reasearch/nerf_recurrent/learning_nerf/train_net.py", line 112, in main
+    train(cfg, network)
+  File "/home/dwl/Desktop/reasearch/nerf_recurrent/learning_nerf/train_net.py", line 24, in train
+    train_loader = make_data_loader(cfg,
+  File "/home/dwl/Desktop/reasearch/nerf_recurrent/learning_nerf/lib/datasets/make_dataset.py", line 91, in make_data_loader
+    dataset = make_dataset(cfg, is_train)
+  File "/home/dwl/Desktop/reasearch/nerf_recurrent/learning_nerf/lib/datasets/make_dataset.py", line 40, in make_dataset
+    dataset = dataset(**args)
+  File "lib/datasets/nerf/llff.py", line 357, in __init__
+  File "lib/datasets/nerf/llff.py", line 143, in _load_data
+  File "lib/datasets/nerf/llff.py", line 118, in _minify
+  File "/home/dwl/anaconda3/envs/learning_nerf/lib/python3.9/subprocess.py", line 424, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/home/dwl/anaconda3/envs/learning_nerf/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'mogrify -resize 12.5% -format png *.jpg' returned non-zero exit status 127.
+
+解决：lib/datasets/nerf/llff.py
+args = ' '.join(['mogrify', '-resize', resizearg, '-format', 'png', '*.{}'.format(ext)])
+修改为
+args = ' '.join(['magick ', 'mogrify', '-resize', resizearg, '-format', 'png', '*.{}'.format(ext)])
+
+**训练数据降分辨率后生成结果非常不准确**：colmap相机位姿测得不准，先用colmap和高清原图像测相机位姿，然后降分辨率训练
 ### 参考资料
 + [NeRF源码解析](https://www.bilibili.com/video/BV1d841187tn/?share_source=copy_web&vd_source=82f2d2d3d2d3b3112e473c0a443cc278)

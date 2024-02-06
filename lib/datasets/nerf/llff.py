@@ -113,6 +113,8 @@ def _minify(basedir, factors=[], resolutions=[]):
         ext = imgs[0].split('.')[-1]
         # 执行一个shell命令
         args = ' '.join(['mogrify', '-resize', resizearg, '-format', 'png', '*.{}'.format(ext)])
+        # args = ' '.join(['magick ', 'mogrify', '-resize', resizearg, '-format', 'png', '*.{}'.format(ext)])
+
         print(args)
         os.chdir(imgdir)
         check_output(args, shell=True)
